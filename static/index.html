@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F5F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171A16" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Limpieza">
+<title>Limpieza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/calma.css?v=3006c142">
+<script src="/calma.js?v=3006c142"></script>
+<style>
+  /* Estilo Calma: tokens en /calma.css (fuente: ~/estilo). Los nombres de abajo son los
+     de siempre de esta app, apuntando a los tokens comunes. Los colores de persona son suyos. */
+  :root {
+    --bg: var(--fondo); --card: var(--carta); --ink: var(--texto); --muted: var(--suave);
+    --line: var(--linea); --ok: var(--acento); --casa: var(--aviso); --falta: var(--peligro);
+    --alberto: #2F6FD6; --yago: var(--acento);
+  }
+  @media (prefers-color-scheme: dark) { :root { --alberto: #6EA2F2; } }
+  body {
+    padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    max-width: 1060px; margin-inline: auto; font-size: 16px;
+  }
+  h1.app { margin: 4px 0 18px; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .page { display: grid; gap: 28px; align-items: start; }
+  .page > * { min-width: 0; }   /* el <select> de normas es ancho y si no desborda en móvil */
+  @media (min-width: 900px) { .page { grid-template-columns: minmax(0, 1fr) 320px; } }
+  header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  header div { flex: 1; text-align: center; }
+  header small { display: block; color: var(--muted); font-size: 13px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .nav {
+    min-width: 44px; min-height: 44px; border: 1px solid var(--line);
+    border-radius: 12px; background: var(--card); font-size: 22px;
+  }
+  .room {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--who);
+    border-radius: 14px; padding: 14px; margin-bottom: 8px; min-height: 60px;
+  }
+  .room b { flex: 1; font-weight: 600; }
+  .room span { color: var(--who); font-size: 14px; font-weight: 600; }
+  .room i { font-style: normal; font-size: 22px; width: 24px; text-align: center; color: var(--muted); }
+  .room.done { opacity: .55; }
+  .room.done b { text-decoration: line-through; }
+  .room.done i { color: var(--ok); }
+  .rules { display: grid; gap: 16px; margin-top: 28px; }
+  @media (min-width: 560px) { .rules { grid-template-columns: 1fr 1fr; } }
+  h2 { font-size: 16px; font-weight: 600; color: var(--who); margin: 0 0 10px; }
+  ol { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  li input {
+    width: 100%; font: inherit; color: inherit; background: var(--card);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+  }
+  li input:focus { outline: 2px solid var(--who); outline-offset: -1px; }
+  .general { margin-top: 28px; }
+
+  .faults {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px;
+  }
+  @media (min-width: 900px) { .faults { position: sticky; top: 16px; } }
+  .faults select, .faults input {
+    width: 100%; font: inherit; color: inherit; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px;
+  }
+  .quien { display: flex; gap: 8px; }
+  .cargar {
+    flex: 1; min-height: 44px; border: 1px solid var(--who); color: var(--who);
+    background: transparent; border-radius: 10px; font-weight: 600;
+  }
+  .cargar:disabled { opacity: .4; cursor: default; }
+  .tot {
+    display: flex; align-items: baseline; gap: 8px; margin-top: 18px;
+    border-top: 1px solid var(--line); padding-top: 12px;
+  }
+  .tot b { flex: 1; color: var(--who); font-size: 14px; text-transform: uppercase; letter-spacing: .04em; }
+  .tot em { font-style: normal; font-size: 26px; font-weight: 700; }
+  .tot small { color: var(--muted); }
+  .faults ul { list-style: none; margin: 6px 0 0; padding: 0; font-size: 14px; }
+  .faults ul li { display: flex; gap: 8px; margin-bottom: 4px; color: var(--muted); }
+  .faults ul li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .faults ul li b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .dia { margin-top: 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .falta { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 5px 0; }
+  .falta span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .falta em { font-style: normal; font-weight: 600; color: var(--who); }
+  .falta button { background: none; border: 0; color: var(--muted); font-size: 18px; padding: 0 4px; }
+  .vacio { color: var(--muted); font-size: 14px; margin-top: 14px; }
+  footer { margin-top: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+</style>
+<body>
+ <h1 class="app">Limpieza</h1>
+ <div class="page">
+  <div>
+    <header>
+      <button class="nav" id="prev" aria-label="Semana anterior">&lsaquo;</button>
+      <div><strong id="wlabel"></strong><small id="wrange"></small></div>
+      <button class="nav" id="next" aria-label="Semana siguiente">&rsaquo;</button>
+    </header>
+
+    <main id="board"></main>
+
+    <div class="rules">
+      <section style="--who: var(--alberto)"><h2>Normas de Alberto</h2><ol id="r-alberto"></ol></section>
+      <section style="--who: var(--yago)"><h2>Normas de Yago</h2><ol id="r-yago"></ol></section>
+    </div>
+
+    <section class="general" style="--who: var(--casa)">
+      <h2>Normas generales</h2>
+      <ol id="r-general"></ol>
+    </section>
+  </div>
+
+  <aside class="faults" style="--who: var(--falta)">
+    <h2>Incumplimientos</h2>
+    <select id="f-rule" aria-label="Norma incumplida"></select>
+    <input type="date" id="f-date" aria-label="Día">
+    <div class="quien">
+      <button class="cargar" data-w="alberto" style="--who: var(--alberto)">Alberto</button>
+      <button class="cargar" data-w="yago" style="--who: var(--yago)">Yago</button>
+    </div>
+    <div id="tally"></div>
+    <div id="log"></div>
+  </aside>
+ </div>
+
+  <footer id="status">&nbsp;</footer>
+
+<script>
+const ROOMS = ["Salón", "Cocina", "Baño", "Pasillo"];
+const USERS = ["alberto", "yago"];
+const NAME = { alberto: "Alberto", yago: "Yago" };
+
+let state = { rules: { alberto: [], yago: [] }, general: [], faults: [], done: {} };
+let cur = new Date();
+const ol_general = document.getElementById("r-general");
+
+const monday = d => {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+};
+const key = d => monday(d).toLocaleDateString("sv");          // YYYY-MM-DD del lunes
+const weekNum = d => Math.round(monday(d) / 6048e5);          // paridad estable = turno
+const owner = i => USERS[(i + weekNum(cur)) % 2];
+const fmt = d => d.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+
+async function load() {
+  state = await (await fetch("/api/state")).json();
+  render();
+}
+
+let timer;
+function save(msg = "Guardado") {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    const r = await fetch("/api/state", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(state),
+    });
+    state = await r.json();
+    status.textContent = msg;
+    setTimeout(() => (status.innerHTML = "&nbsp;"), 1500);
+  }, 400);
+}
+
+function render() {
+  const mon = monday(cur), sun = new Date(mon);
+  sun.setDate(sun.getDate() + 6);
+  const thisWeek = key(new Date()) === key(cur);
+  wlabel.textContent = thisWeek ? "Esta semana" : "Semana del " + fmt(mon);
+  wrange.textContent = fmt(mon) + " – " + fmt(sun);
+
+  const done = state.done[key(cur)] || [];
+  board.replaceChildren(...ROOMS.map((room, i) => {
+    const who = owner(i), isDone = done.includes(room);
+    const b = document.createElement("button");
+    b.className = "room" + (isDone ? " done" : "");
+    b.style.setProperty("--who", "var(--" + who + ")");
+    b.innerHTML = `<i>${isDone ? "✓" : "○"}</i><b></b><span></span>`;
+    b.querySelector("b").textContent = room;
+    b.querySelector("span").textContent = NAME[who];
+    b.onclick = () => {
+      const k = key(cur), list = state.done[k] || [];
+      state.done[k] = isDone ? list.filter(r => r !== room) : [...list, room];
+      render();
+      save(isDone ? "Desmarcado" : "¡Hecho!");
+      // el piso entero limpio esta semana: confeti (una vez por semana y navegador)
+      if (!isDone && ROOMS.every(r => state.done[k].includes(r))) calma.fiesta("piso-" + k);
+    };
+    return b;
+  }));
+
+  for (const u of USERS) {
+    const ol = document.getElementById("r-" + u);
+    if (ol.children.length) {                     // no pisar lo que se está escribiendo
+      [...ol.querySelectorAll("input")].forEach((inp, i) => {
+        if (document.activeElement !== inp) inp.value = state.rules[u][i] || "";
+      });
+      continue;
+    }
+    ol.replaceChildren(...Array.from({ length: 5 }, (_, i) => {
+      const li = document.createElement("li");
+      const inp = document.createElement("input");
+      inp.value = state.rules[u][i] || "";
+      inp.placeholder = "Norma " + (i + 1);
+      inp.oninput = () => { state.rules[u][i] = inp.value; save(); };
+      li.append(inp);
+      return li;
+    }));
+  }
+
+  renderGeneral();
+  renderFaults();
+}
+
+// --- Incumplimientos -------------------------------------------------------
+const byId = id => document.getElementById(id);
+const hoy = () => new Date().toLocaleDateString("sv");
+const fmtDia = s => {
+  const d = new Date(s + "T00:00");
+  const hace = Math.round((new Date(hoy() + "T00:00") - d) / 864e5);
+  if (hace === 0) return "Hoy";
+  if (hace === 1) return "Ayer";
+  return d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+};
+
+function renderFaults() {
+  const sel = byId("f-rule"), fecha = byId("f-date");
+  if (!fecha.value) fecha.value = hoy();
+
+  // El desplegable se reconstruye sólo si cambian las normas, para no perder lo elegido.
+  const grupos = [
+    ["Normas de Alberto", state.rules.alberto],
+    ["Normas de Yago", state.rules.yago],
+    ["Normas generales", state.general],
+  ].map(([t, rs]) => [t, rs.filter(r => r.trim())]);
+  const firma = JSON.stringify(grupos);
+  if (sel.dataset.firma !== firma) {
+    const antes = sel.value;
+    sel.dataset.firma = firma;
+    sel.replaceChildren(...grupos.filter(([, rs]) => rs.length).map(([titulo, rs]) => {
+      const g = document.createElement("optgroup");
+      g.label = titulo;
+      g.append(...rs.map(r => new Option(r, r)));
+      return g;
+    }));
+    sel.value = antes;
+    if (!sel.value) sel.selectedIndex = 0;
+  }
+  document.querySelectorAll(".cargar").forEach(b => (b.disabled = !sel.options.length));
+
+  const faults = state.faults;
+  byId("tally").replaceChildren(...USERS.map(u => {
+    const mias = faults.filter(f => f.w === u);
+    const cuenta = {};
+    for (const f of mias) cuenta[f.r] = (cuenta[f.r] || 0) + 1;
+    const wrap = document.createElement("div");
+    wrap.style.setProperty("--who", "var(--" + u + ")");
+    wrap.innerHTML = `<div class="tot"><b></b><em></em><small>faltas</small></div><ul></ul>`;
+    wrap.querySelector("b").textContent = NAME[u];
+    wrap.querySelector("em").textContent = mias.length;
+    wrap.querySelector("ul").replaceChildren(...Object.entries(cuenta)
+      .sort((a, b) => b[1] - a[1])
+      .map(([regla, n]) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span></span><b></b>`;
+        li.querySelector("span").textContent = regla;
+        li.querySelector("span").title = regla;
+        li.querySelector("b").textContent = "×" + n;
+        return li;
+      }));
+    return wrap;
+  }));
+
+  const log = byId("log");
+  if (!faults.length) {
+    log.replaceChildren(Object.assign(document.createElement("p"),
+      { className: "vacio", textContent: "Sin faltas. De momento." }));
+    return;
+  }
+  const dias = [...new Set(faults.map(f => f.d))].sort().reverse();
+  log.replaceChildren(...dias.flatMap(d => {
+    const h = document.createElement("div");
+    h.className = "dia";
+    h.textContent = fmtDia(d);
+    return [h, ...faults
+      .map((f, i) => [f, i])
+      .filter(([f]) => f.d === d)
+      .reverse()
+      .map(([f, i]) => {
+        const row = document.createElement("div");
+        row.className = "falta";
+        row.style.setProperty("--who", "var(--" + f.w + ")");
+        row.innerHTML = `<em></em><span></span><button title="Quitar">×</button>`;
+        row.querySelector("em").textContent = NAME[f.w];
+        row.querySelector("span").textContent = f.r;
+        row.querySelector("span").title = f.r;
+        row.querySelector("button").onclick = () => {
+          state.faults = faults.filter((_, j) => j !== i);
+          render();
+          save("Quitada");
+        };
+        return row;
+      })];
+  }));
+}
+
+document.querySelectorAll(".cargar").forEach(b => (b.onclick = () => {
+  state.faults = [...state.faults, { d: byId("f-date").value || hoy(), w: b.dataset.w, r: byId("f-rule").value }];
+  render();
+  save("Apuntado");
+}));
+
+// Fila libre: se lee del DOM, así los índices nunca se desincronizan al compactar en el servidor.
+function generalRow(value) {
+  const li = document.createElement("li");
+  const inp = document.createElement("input");
+  inp.value = value;
+  inp.placeholder = "Añade una norma…";
+  inp.oninput = () => {
+    if (inp.value && li === ol_general.lastElementChild) ol_general.append(generalRow(""));
+    state.general = [...ol_general.querySelectorAll("input")].map(i => i.value);
+    save();
+  };
+  li.append(inp);
+  return li;
+}
+
+function renderGeneral() {
+  const ol = ol_general, want = [...state.general, ""];   // siempre una fila vacía al final
+  if (ol.children.length === want.length) {               // no pisar lo que se está escribiendo
+    [...ol.querySelectorAll("input")].forEach((inp, i) => {
+      if (document.activeElement !== inp) inp.value = want[i];
+    });
+    return;
+  }
+  ol.replaceChildren(...want.map(generalRow));
+}
+
+prev.onclick = () => { cur.setDate(cur.getDate() - 7); render(); };
+next.onclick = () => { cur.setDate(cur.getDate() + 7); render(); };
+addEventListener("visibilitychange", () => !document.hidden && load());
+load();
+</script>
