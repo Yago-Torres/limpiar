@@ -3,19 +3,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#F4F5F0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171A16" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Limpieza">
 <title>Limpieza</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="/calma.css?v=3006c142">
-<script src="/calma.js?v=3006c142"></script>
+<link rel="preload" href="/fuentes/instrument-sans-normal-latin.woff2?v=1" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/calma.css?v=efb64faa">
+<script src="/calma.js?v=efb64faa"></script>
 <style>
   /* Estilo Calma: tokens en /calma.css (fuente: ~/estilo). Los nombres de abajo son los
      de siempre de esta app, apuntando a los tokens comunes. Los colores de persona son suyos. */
@@ -29,26 +27,26 @@
     padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     max-width: 1060px; margin-inline: auto; font-size: 16px;
   }
-  h1.app { margin: 4px 0 18px; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  h1.app { margin: 4px 0 18px; font-size: var(--t-titulo); font-weight: 700; letter-spacing: -.02em; }
   .page { display: grid; gap: 28px; align-items: start; }
   .page > * { min-width: 0; }   /* el <select> de normas es ancho y si no desborda en móvil */
   @media (min-width: 900px) { .page { grid-template-columns: minmax(0, 1fr) 320px; } }
   header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
   header div { flex: 1; text-align: center; }
-  header small { display: block; color: var(--muted); font-size: 13px; }
+  header small { display: block; color: var(--muted); font-size: var(--t-pequeno); }
   button { font: inherit; color: inherit; cursor: pointer; }
   .nav {
     min-width: 44px; min-height: 44px; border: 1px solid var(--line);
-    border-radius: 12px; background: var(--card); font-size: 22px;
+    border-radius: var(--r-s); background: var(--card); font-size: var(--t-seccion);
   }
   .room {
     display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
     background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--who);
-    border-radius: 14px; padding: 14px; margin-bottom: 8px; min-height: 60px;
+    border-radius: var(--r); padding: 14px; margin-bottom: 8px; min-height: 60px;
   }
   .room b { flex: 1; font-weight: 600; }
-  .room span { color: var(--who); font-size: 14px; font-weight: 600; }
-  .room i { font-style: normal; font-size: 22px; width: 24px; text-align: center; color: var(--muted); }
+  .room span { color: var(--who); font-size: var(--t-texto); font-weight: 600; }
+  .room i { font-style: normal; font-size: var(--t-seccion); width: 24px; text-align: center; color: var(--muted); }
   .room.done { opacity: .55; }
   .room.done b { text-decoration: line-through; }
   .room.done i { color: var(--ok); }
@@ -59,44 +57,44 @@
   li { margin-bottom: 6px; }
   li input {
     width: 100%; font: inherit; color: inherit; background: var(--card);
-    border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+    border: 1px solid var(--line); border-radius: var(--r-s); padding: 10px;
   }
   li input:focus { outline: 2px solid var(--who); outline-offset: -1px; }
   .general { margin-top: 28px; }
 
   .faults {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
     padding: 16px;
   }
   @media (min-width: 900px) { .faults { position: sticky; top: 16px; } }
   .faults select, .faults input {
     width: 100%; font: inherit; color: inherit; background: var(--bg);
-    border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px;
+    border: 1px solid var(--line); border-radius: var(--r-s); padding: 10px; margin-bottom: 8px;
   }
   .quien { display: flex; gap: 8px; }
   .cargar {
     flex: 1; min-height: 44px; border: 1px solid var(--who); color: var(--who);
-    background: transparent; border-radius: 10px; font-weight: 600;
+    background: transparent; border-radius: var(--r-s); font-weight: 600;
   }
   .cargar:disabled { opacity: .4; cursor: default; }
   .tot {
     display: flex; align-items: baseline; gap: 8px; margin-top: 18px;
     border-top: 1px solid var(--line); padding-top: 12px;
   }
-  .tot b { flex: 1; color: var(--who); font-size: 14px; text-transform: uppercase; letter-spacing: .04em; }
-  .tot em { font-style: normal; font-size: 26px; font-weight: 700; }
+  .tot b { flex: 1; color: var(--who); font-size: var(--t-texto); text-transform: uppercase; letter-spacing: .04em; }
+  .tot em { font-style: normal; font-size: var(--t-titulo); font-weight: 700; }
   .tot small { color: var(--muted); }
-  .faults ul { list-style: none; margin: 6px 0 0; padding: 0; font-size: 14px; }
+  .faults ul { list-style: none; margin: 6px 0 0; padding: 0; font-size: var(--t-texto); }
   .faults ul li { display: flex; gap: 8px; margin-bottom: 4px; color: var(--muted); }
   .faults ul li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .faults ul li b { color: var(--ink); font-variant-numeric: tabular-nums; }
-  .dia { margin-top: 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-  .falta { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 5px 0; }
+  .dia { margin-top: 14px; font-size: var(--t-pequeno); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .falta { display: flex; align-items: center; gap: 8px; font-size: var(--t-texto); padding: 5px 0; }
   .falta span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .falta em { font-style: normal; font-weight: 600; color: var(--who); }
-  .falta button { background: none; border: 0; color: var(--muted); font-size: 18px; padding: 0 4px; }
-  .vacio { color: var(--muted); font-size: 14px; margin-top: 14px; }
-  footer { margin-top: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+  .falta button { background: none; border: 0; color: var(--muted); font-size: var(--t-destacado); padding: 0 4px; }
+  .vacio { color: var(--muted); font-size: var(--t-texto); margin-top: 14px; }
+  footer { margin-top: 24px; text-align: center; color: var(--muted); font-size: var(--t-pequeno); }
 </style>
 <body>
  <h1 class="app">Limpieza</h1>
